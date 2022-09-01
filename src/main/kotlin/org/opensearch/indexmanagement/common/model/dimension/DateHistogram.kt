@@ -55,6 +55,7 @@ data class DateHistogram(
         return builder.field(DIMENSION_SOURCE_FIELD_FIELD, sourceField)
             .field(DIMENSION_TARGET_FIELD_FIELD, targetField)
             .field(DATE_HISTOGRAM_TIMEZONE_FIELD, timezone.id)
+            .field(FORMAT, format)
             .endObject()
             .endObject()
     }
@@ -76,13 +77,15 @@ data class DateHistogram(
             .missingBucket(true)
             .field(this.sourceField)
             .timeZone(this.timezone)
-            .format(this.format)
             .apply {
                 calendarInterval?.let {
                     this.calendarInterval(DateHistogramInterval(it))
                 }
                 fixedInterval?.let {
                     this.fixedInterval(DateHistogramInterval(it))
+                }
+                format?.let {
+                    this.format(it)
                 }
             }
     }
@@ -154,7 +157,7 @@ data class DateHistogram(
                     DATE_HISTOGRAM_TIMEZONE_FIELD -> timezone = ZoneId.of(xcp.text())
                     DIMENSION_SOURCE_FIELD_FIELD -> sourceField = xcp.text()
                     DIMENSION_TARGET_FIELD_FIELD -> targetField = xcp.text()
-                    FORMAT -> format = xcp.text()
+                    FORMAT -> format = xcp.textOrNull()
                     else -> throw IllegalArgumentException("Invalid field [$fieldName] found in date histogram")
                 }
             }
